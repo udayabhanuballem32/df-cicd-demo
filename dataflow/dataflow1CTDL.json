@@ -6,19 +6,52 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "DataSetSql",
+						"referenceName": "Dataset_csv",
 						"type": "DatasetReference"
 					},
 					"name": "sql"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Dataset_csv",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "filter1"
+				}
+			],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
+				"source(output(",
+				"          UserName as string,",
+				"          Gender as string,",
+				"          Phone as string,",
+				"          Email as string,",
+				"          CreditCard as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> sql"
+				"     ignoreNoFilesFound: false) ~> sql",
+				"sql filter(!isNull(Phone)) ~> filter1",
+				"filter1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          UserName as string,",
+				"          Gender as string,",
+				"          Phone as string,",
+				"          Email as string,",
+				"          CreditCard as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
